@@ -31,4 +31,18 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@474.79d3jxt.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
-console.log(uri)
+
+
+const run=async()=>{
+
+try{
+  const productcollection=client.db("carDeller").collection("products")
+  
+
+
+}
+finally{}
+
+
+}
+run().catch(ero=>console.log(ero))

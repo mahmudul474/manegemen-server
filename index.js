@@ -48,7 +48,7 @@ const run = async () => {
   try {
     const productcollection = client.db("carDeller").collection("products");
     const orderscollection = client.db("carDeller").collection("orders");
-
+  const enginiercollection=client.db("carDeller").collection("enginiers");
     const userCollection = client.db("carDeller").collection("users");
 
     ///jwt
@@ -214,6 +214,37 @@ if(email !== decodedEmail){
       console.log(result);
       res.send(result);
     });
+
+
+
+
+
+
+
+
+
+//add speciyalty
+
+ app.get("/servicEnginer", async (req, res) => {
+   const query = {};
+   const result = await productcollection.find(query).project({title:1}).toArray();
+   res.send(result);
+ });
+
+
+ /// add ingniyer
+
+ app.post("/servicEnginer", async (req, res) => {
+   const query = {};
+   const result = await enginiercollection.insertOne(query);
+   
+   res.send(result);
+ })
+
+
+
+
+
   } finally {
   }
 };

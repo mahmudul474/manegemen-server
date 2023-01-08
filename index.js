@@ -97,6 +97,60 @@ const run = async () => {
       res.send(result);
     });
 
+
+
+
+
+
+
+///get all users
+
+
+app.get("/users",async(req,res)=>{
+  const query={}
+  const users = await userCollection.find(query).toArray()
+  res.send(users);
+})
+
+
+//admin route
+
+app.put("/users/admin/:id", veryfyjwt,async(req,res)=>{
+
+  const decodedEmail=req.decoded.email;
+  const query={email:decodedEmail}
+  const user = await userCollection.findOne(query);
+  if (user?.role !=="admin") {
+    return res.status(403).send({ message: "unauthorized" });
+  }
+  const id = req.params.id;
+   const filter={_id:ObjectId(id)}
+   const options={upsert:true}
+   const uptdoc={
+    $set:{
+      role:"admin",
+    }
+   }
+const result=await userCollection.updateOne(filter,uptdoc,options)
+res.send(result);
+
+})
+
+
+///get admin
+
+app.get("/admin/users/:email",async(req,res)=>{
+const email=req.params.email
+const query={email:email}
+const user=await userCollection.findOne(query)
+res.send({isAdmin:user?.role==="admin"})
+
+})
+
+
+
+
+
     //  load all products
 
     app.get("/cars", async (req, res) => {

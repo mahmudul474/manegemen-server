@@ -49,7 +49,25 @@ const run = async () => {
     const productcollection = client.db("carDeller").collection("products");
     const orderscollection = client.db("carDeller").collection("orders");
   const enginiercollection=client.db("carDeller").collection("enginiers");
-    const userCollection = client.db("carDeller").collection("users");
+    const userCollection = client.db("carDeller").collection("users")
+
+
+
+
+    ///admin veryfy
+
+
+    const verifyAdmin=async(req,res,next)=>{
+
+ const decodedEmail = req.decoded.email;
+ const query = { email: decodedEmail };
+ const user = await userCollection.findOne(query);
+ if (user?.role !== "admin") {
+   return res.status(403).send({ message: "unauthorized" });
+ }
+
+      next()
+    }
 
     ///jwt
 
@@ -115,26 +133,18 @@ app.get("/users",async(req,res)=>{
 
 //admin route
 
-app.put("/users/admin/:id", veryfyjwt,async(req,res)=>{
-
-  const decodedEmail=req.decoded.email;
-  const query={email:decodedEmail}
-  const user = await userCollection.findOne(query);
-  if (user?.role !=="admin") {
-    return res.status(403).send({ message: "unauthorized" });
-  }
+app.put("/users/admin/:id", veryfyjwt, verifyAdmin, async (req, res) => {
   const id = req.params.id;
-   const filter={_id:ObjectId(id)}
-   const options={upsert:true}
-   const uptdoc={
-    $set:{
-      role:"admin",
+  const filter = { _id: ObjectId(id) };
+  const options = { upsert: true };
+  const uptdoc = {
+    $set: {
+      role: "admin"
     }
-   }
-const result=await userCollection.updateOne(filter,uptdoc,options)
-res.send(result);
-
-})
+  };
+  const result = await userCollection.updateOne(filter, uptdoc, options);
+  res.send(result);
+});
 
 
 ///get admin
@@ -175,7 +185,7 @@ res.send({isAdmin:user?.role==="admin"})
       res.send(result);
     });
 
-    app.get("/orders", veryfyjwt, async (req, res) => {
+    app.get("/orders", veryfyjwt,verifyAdmin, async (req, res) => {
     const email= req.query.email
     const query = { email: email };
        
@@ -225,7 +235,7 @@ if(email !== decodedEmail){
 
 //add speciyalty
 
- app.get("/servicEnginer", async (req, res) => {
+ app.get("/servicEnginer", veryfyjwt,verifyAdmin, async (req, res) => {
    const query = {};
    const result = await productcollection.find(query).project({title:1}).toArray();
    res.send(result);
@@ -234,12 +244,31 @@ if(email !== decodedEmail){
 
  /// add ingniyer
 
- app.post("/servicEnginer", async (req, res) => {
-   const query = {};
-   const result = await enginiercollection.insertOne(query);
+ app.post("/servicEnginer", veryfyjwt,verifyAdmin, async (req, res) => {
+   const user = req.body
+   const result = await enginiercollection.insertOne(user);
    
    res.send(result);
  })
+
+
+
+ //get inginers
+ app.get("/Enginer", veryfyjwt,verifyAdmin, async (req, res) => {
+   const query = {};
+   const result = await enginiercollection.find(query).toArray();
+   res.send(result);
+ })
+
+
+ //dellet engienr
+
+app.delete("/enginier/:id",veryfyjwt,verifyAdmin, async(req,res)=>{
+   const id = req.params.id;
+   const query = { _id: ObjectId(id) };
+   const result = await enginiercollection.deleteOne(query);
+   res.send(result);
+})
 
 
 

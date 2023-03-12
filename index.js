@@ -50,6 +50,7 @@ const run = async () => {
     const orderscollection = client.db("carDeller").collection("orders");
   const enginiercollection=client.db("carDeller").collection("enginiers");
     const userCollection = client.db("carDeller").collection("users")
+    const feadbackcollection=client.db("carDeller").collection("febadbacks")
 
 
 
@@ -259,6 +260,12 @@ if(email !== decodedEmail){
    const result = await enginiercollection.find(query).toArray();
    res.send(result);
  })
+ app.get("/allnginer",  async (req, res) => {
+   const query = {};
+   const result = await enginiercollection.find(query).toArray();
+   res.send(result);
+ })
+
 
 
  //dellet engienr
@@ -269,6 +276,94 @@ app.delete("/enginier/:id",veryfyjwt,verifyAdmin, async(req,res)=>{
    const result = await enginiercollection.deleteOne(query);
    res.send(result);
 })
+
+
+
+//post feadback
+
+app.post("/feadback",async(req,res)=>{
+  const feadback=req.body
+  const result = await feadbackcollection.insertOne(feadback)
+  res.send(result)
+
+})
+
+
+//get feadback
+
+app.get("/feadbacks/:id",async(req,res)=>{
+  const serviceid=req.params.id
+  const query = { product_id:new ObjectId(serviceid)};
+  const result = await feadbackcollection.find({query}).toArray()
+  res.send(result)
+})
+
+
+
+
+
+
+
+
+//post cours
+
+const courscollection=client.db("carDeller").collection("cours")
+app.post("/cours",async(req,res)=>{
+  const cours=req.body
+  const result=await  courscollection.insertOne(cours)
+  res.send(result);
+})
+
+//getall cours
+
+app.get("/allcourses",async(req,res)=>{
+  const result=await courscollection.find({}).toArray()
+  res.send(result)
+})
+
+
+
+
+
+
+///add block
+  const blocgcollections=client.db("carDeller").collection("blog")
+
+  app.post("/blog",async(req,res)=>{
+    
+     const blog=req.body
+     const result =await blocgcollections.insertOne(blog)
+     res.send(result);
+    
+  })
+
+  app.get("/allblog",async(req,res)=>{
+    const result=await blocgcollections.find({}).toArray()
+    res.send(result)
+  })
+
+
+
+
+  //manage banner
+
+  const bannercollection = client.db("carDeller").collection("banner")
+  app.post("/banner",async(req,res)=>{
+     const banner = req.body
+     const result = await bannercollection.insertOne(banner);
+     res.send(result);
+     
+  });
+
+app.get("/getbanner",async(req,res)=>{
+  const result = await bannercollection.findOne({}, { sort: { _id: -1 } });
+  console.log(result);
+  res.send(result)
+})
+
+
+
+
 
 
 
